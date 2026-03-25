@@ -27,5 +27,3 @@ This repository hosts the **Week 12 CFAT Annotations Ops Plan Dashboard**, a liv
 Open to suggestions! Create an issue or submit a PR.
 
 ---
-
-*Dashboard last updated: ${DATE}*  
