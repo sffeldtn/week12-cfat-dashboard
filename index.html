@@ -5,15 +5,45 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Week 12 CFAT Dashboard</title>
   <style>
-    /* Add your CSS here */
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    .metric { margin-bottom: 20px; }
-    .progress-bar { width: 100%; background: #f0f0f0; border-radius: 5px; }
-    .progress { height: 20px; background: #4caf50; border-radius: 5px; transition: width 0.5s; }
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+    .metric { 
+      background: white; 
+      padding: 15px; 
+      margin-bottom: 15px; 
+      border-radius: 8px; 
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+    }
+    h2 { margin-top: 0; color: #333; }
+    .progress-bar { 
+      width: 100%; 
+      background: #eee; 
+      height: 20px; 
+      border-radius: 10px; 
+      margin: 10px 0; 
+    }
+    .progress { 
+      height: 100%; 
+      background: #4caf50; 
+      border-radius: 10px; 
+      transition: width 0.5s; 
+    }
+    .lang-grid { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); 
+      gap: 10px; 
+    }
+    .lang-card { 
+      background: #f9f9f9; 
+      padding: 10px; 
+      border-radius: 5px; 
+      text-align: center; 
+    }
   </style>
 </head>
 <body>
-  <h1>📊 Week 12 CFAT Dashboard</h1>
+  <div class="metric">
+    <h2>📊 Week 12 CFAT Dashboard</h2>
+  </div>
 
   <!-- QBR Hallucinations -->
   <div class="metric">
@@ -26,10 +56,37 @@
   <!-- GRS Languages -->
   <div class="metric">
     <h2>GRS Languages</h2>
-    <div id="grs-languages"></div>
+    <div class="lang-grid" id="grs-languages"></div>
+    <p>AHT: <span id="grs-aht">3.69</span> min</p>
   </div>
 
-  <!-- Add other sections here -->
+  <!-- Videos in 30Secs -->
+  <div class="metric">
+    <h2>Videos in 30Secs</h2>
+    <p>Tasks: <span id="videos-tasks">100</span></p>
+    <p>AHT: <span id="videos-aht">5.30</span> min</p>
+    <div class="progress-bar">
+      <div class="progress" id="videos-progress" style="width: 0%"></div>
+    </div>
+  </div>
+
+  <!-- Mission Bundles -->
+  <div class="metric">
+    <h2>Mission Bundles</h2>
+    <p>Completed: <span id="bundles-completed">1087</span>/<span id="bundles-total">4380</span></p>
+    <p>HC: <span id="bundles-hc">2</span> | Language: <span id="bundles-lang">EN</span></p>
+    <div class="progress-bar">
+      <div class="progress" id="bundles-progress" style="width: 0%"></div>
+    </div>
+  </div>
+
+  <!-- Review Sharing Test -->
+  <div class="metric">
+    <h2>Review Sharing Test</h2>
+    <p>Tasks: <span id="review-tasks">50</span></p>
+    <p>HC: <span id="review-hc">5</span></p>
+    <p>Status: <span id="review-status">starting today</span></p>
+  </div>
 
   <script>
     // Embedded JSON data (replace with your actual data)
@@ -84,14 +141,38 @@
     const grsContainer = document.getElementById('grs-languages');
     for (const [lang, data] of Object.entries(dashboardData.grs.languages)) {
       const langDiv = document.createElement('div');
-      langDiv.innerHTML = `
-        <strong>${lang}:</strong> 
-        ${data.completed !== undefined 
-          ? `${data.completed}/${data.total} (${Math.round((data.completed / data.total) * 100)}%)` 
-          : data.status}
-      `;
+      langDiv.className = 'lang-card';
+      if (data.completed !== undefined) {
+        const percent = Math.round((data.completed / data.total) * 100);
+        langDiv.innerHTML = `
+          <strong>${lang}</strong><br>
+          ${data.completed}/${data.total} (${percent}%)
+        `;
+      } else {
+        langDiv.innerHTML = `<strong>${lang}</strong><br>${data.status}`;
+      }
       grsContainer.appendChild(langDiv);
     }
+    document.getElementById('grs-aht').textContent = dashboardData.grs.aht;
+
+    // Render Videos in 30Secs Progress Bar
+    const videosPercent = Math.round((dashboardData.videos_30secs.tasks / 100) * 100);
+    document.getElementById('videos-tasks').textContent = dashboardData.videos_30secs.tasks;
+    document.getElementById('videos-aht').textContent = dashboardData.videos_30secs.aht;
+    document.getElementById('videos-progress').style.width = `${videosPercent}%`;
+
+    // Render Mission Bundles Progress Bar
+    const bundlesPercent = Math.round((dashboardData.mission_bundles.completed / dashboardData.mission_bundles.total) * 100);
+    document.getElementById('bundles-completed').textContent = dashboardData.mission_bundles.completed;
+    document.getElementById('bundles-total').textContent = dashboardData.mission_bundles.total;
+    document.getElementById('bundles-hc').textContent = dashboardData.mission_bundles.hc;
+    document.getElementById('bundles-lang').textContent = dashboardData.mission_bundles.language;
+    document.getElementById('bundles-progress').style.width = `${bundlesPercent}%`;
+
+    // Render Review Sharing
+    document.getElementById('review-tasks').textContent = dashboardData.review_sharing.tasks;
+    document.getElementById('review-hc').textContent = dashboardData.review_sharing.hc;
+    document.getElementById('review-status').textContent = dashboardData.review_sharing.status;
   </script>
 </body>
 </html>
